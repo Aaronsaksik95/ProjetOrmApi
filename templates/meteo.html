@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Api Météo
+{% endblock title %}
+
+{% block intro %}
+Celle-ci retourne tous les cas de Corona Virus,
+ceux qui se sont rétablis ainsi que le nombre de mort
+dans chaque ville d'un pays choisi, mais également en fonction d'une date.
+{% endblock intro %}
+
+{% block content %}
+<p class="pl-5 font-weight-light">Recherchez un pays et choisissez une date.</p>
+<div>
+    
+    <div class="d-flex">
+        <form class="form-inline mb-5 p-3" method="POST">
+            <div class="form-group mx-sm-3 mb-2">
+                <input type="text" class="form-control" name="ville" id="staticEmail2">
+            </div>
+            <button type="submit" class="btn btn-info mb-2">Rechercher</button>
+        </form>
+    </div>
+    {% if (ville == "") %}
+    <div></div>
+    {% else %}
+    <div class="card m-3 p-0 col-2 border-info" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title m font-weight-light">{{ville}}</h5>
+            <h6 class="card-subtitle mb-2 text-info">{{date}}</h6>
+            <ul class="p-3 m-0">
+                <li class="card-text">Température: {{temp}}°C.</li>
+                <li class="card-text">Vent: {{wind}} Km/h.</li>
+                <li class="card-text">Pression: {{press}} hPa.</li>
+                <li class="card-text">Humidité: {{humi}} %.</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock content %}

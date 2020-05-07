@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Api Covid-19
+{% endblock title %}
+
+{% block intro %}
+Celle-ci retourne tous les cas de Corona Virus,
+ceux qui se sont rétablis ainsi que le nombre de mort
+dans chaque ville d'un pays choisi, mais également en fonction d'une date.
+{% endblock intro %}
+
+{% block content %}
+<p class="pl-5 m-0 font-weight-light">Recherchez un pays et choisissez une date.</p>
+<div class="d-flex">
+   <form class="form-inline mb-5 p-3" method="POST">
+      <div class="form-group mx-sm-3 mb-2">
+         <select class="form-control" id="exampleFormControlSelect1" name="pays">
+            <option value="France">France</option>
+            {% for i in countries %}
+            <option value="{{ i.Country }}">{{ i.Country }}</option>
+            {% endfor %}
+         </select>
+      </div>
+      <div class="form-group mx-sm-3 mb-2">
+         <input type="date" class="form-control" name="date" value="2020-01-01">
+      </div>
+      <button type="submit" class="btn btn-info mb-2">Rechercher</button>
+   </form>
+   <div class="card mb-5 ml-5 p-3 border border-info">
+      <h4>Dans le Monde</h4>
+      <ul class="p-3 m-0">
+         <li class="card-text">Cas confirmé(s): <span class="text-danger">{{confirme}}</span></li>
+         <li class="card-text">Cas rétabli(s): <span class="text-danger">{{death}}</span></li>
+         <li class="card-text">Cas mort(s): <span class="text-danger">{{recover}}</span></li>
+      </ul>
+   </div>
+</div>
+
+<h1 class="border-bottom border-info">{{pays}}</h1>
+<div class="row">
+   {% for i in content %}
+   {% if (i.Province == "") %}
+   <div class="card m-3 p-0 col-2 border-info" style="width: 18rem;">
+      <div class="card-body">
+         <h5 class="card-title m font-weight-light">Total à cette date</h5>
+         <h6 class="card-subtitle mb-2 text-info">{{i.Date[0:10]}}</h6>
+         <ul class="p-3 m-0">
+            <li class="card-text">Cas confirmé(s): {{i.Confirmed}}.</li>
+            <li class="card-text">Cas rétabli(s): {{i.Recovered}}.</li>
+            <li class="card-text">Cas mort(s): {{i.Deaths}}.</li>
+         </ul>
+
+      </div>
+   </div>
+   {% else %}
+   <div class="card m-3 p-0 col-2" style="width: 18rem;">
+      <div class="card-body">
+         <h5 class="card-title m font-weight-light">{{i.Province}}</h5>
+         <h6 class="card-subtitle mb-2 text-muted">{{i.Date[0:10]}}</h6>
+         <ul class="p-3 m-0">
+            <li class="card-text">Cas confirmé(s): {{i.Confirmed}}.</li>
+            <li class="card-text">Cas rétabli(s): {{i.Recovered}}.</li>
+            <li class="card-text">Cas mort(s): {{i.Deaths}}.</li>
+         </ul>
+      </div>
+   </div>
+   {% endif %}
+
+   {% endfor %}
+</div>
+
+
+{% endblock content %}
