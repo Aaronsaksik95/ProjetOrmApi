@@ -45,8 +45,23 @@ def home():
     return render_template('home.html', users=users)
 
 @app.route("/login")
-def login():
+def loginInit():
     return render_template('login.html')
+
+@app.route("/login", methods=['POST'])
+def login():
+    mail = request.form['mail']
+    password = request.form['password']
+    users = Users.query.filter(Users.email_user.endswith(mail)).all()
+    passwordTest = users.email_user
+    return render_template('login.html', passwordTest=passwordTest)
+    
+    
+
+
+@app.route("/sign")
+def signInit():
+    return render_template('sign.html')
 
 @app.route("/sign", methods=['POST'])
 def sign():
@@ -54,7 +69,7 @@ def sign():
     prenom = request.form['prenom']
     mail = request.form['mail']
     password = request.form['password']
-    u = Users(nom, prenom, mail, password)
+    users = Users(nom_user=nom,prenom_user=prenom,email_user=mail,password_user=password)
     db.session.add(u)
     db.session.commit()
     return render_template('sign.html')
