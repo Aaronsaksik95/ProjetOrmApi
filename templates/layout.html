@@ -18,20 +18,24 @@
     <div class="row m-5 pb-5 header">
       <div class="col-3 border-right">
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <a class="nav-link active bg-info" id="v-pills-home-tab" href="/">Accueil</a>
+          <a class="nav-link active bg-info" id="v-pills-home-tab" href="/">Cleaner News</a>
           <a class="nav-link text-info" id="v-pills-profile-tab" href="/news">News</a>
           <a class="nav-link text-info" id="v-pills-messages-tab" href="/meteo?name=Paris">Météo</a>
           <a class="nav-link text-info" id="v-pills-settings-tab" href="/covid-19">Covid-19</a>
         </div>
       </div>
       <div class="col-9">
-        
-        <h1 class="text-center mb-4 text-info">
-          {% block title %}
-          {% endblock title %}
-        </h1>
-        
+        <div class="d-flex justify-content-around">
+          <h1 class="text-center mb-4 text-info">
+            {% block title %}
+            {% endblock title %}
+          </h1>
+          <div>
+            <a class="ml-3 text-info" href="/login">Connexion</a>
+            <a class="ml-3 text-info" href="/sign">Inscription</a>
+          </div>
 
+        </div>
         <h4 class="text-justify text-muted font-weight-light">
           {% block intro %}
           {% endblock intro %}

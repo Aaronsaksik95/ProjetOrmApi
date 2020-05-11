@@ -1,1 +1,17 @@
 {% extends "layout.html" %}
+
+{% block content %}
+{% for user in users %}
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="row">{{user.id_user}}</th>
+            <td>{{user.nom_user}}</td>
+            <td>{{user.prenom_user}}</td>
+            <td>{{user.email_user}}</td>
+            <td>{{user.password_user}}</td>
+        </tr>
+    </thead>
+</table>
+        {% endfor %}
+        {% endblock content %}
