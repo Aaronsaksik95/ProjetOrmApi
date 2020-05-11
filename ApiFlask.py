@@ -1,20 +1,24 @@
-from flask import Flask, render_template, url_for, request, jsonify
+from flask import Flask, render_template, url_for, request, jsonify, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import sessionmaker
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 import requests
 import json
 import datetime
 import sqlalchemy as db
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
+login_manager = LoginManager()
+login_manager.init_app(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:8889/projetApiOrm'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/projetApiOrm'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
 
+
 class Article(db.Model):
-    id_article = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     title_article = db.Column(db.Text, nullable=False)
     content_article = db.Column(db.Text, nullable=False)
     date_article = db.Column(db.DateTime, nullable=False)
@@ -23,26 +27,20 @@ class Article(db.Model):
         return '<Article %r>' % self.id_article
 
 class Commentaire(db.Model):
-    id_com = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     content_com = db.Column(db.Text, nullable=False)
     date_com = db.Column(db.DateTime, nullable=False)
     def __repr__(self):
         return '<Commentaire %r>' % self.id_com
 
-class Users(db.Model):
-    id_user = db.Column(db.Integer, primary_key=True)
-    nom_user = db.Column(db.String(50), nullable=False)
-    prenom_user = db.Column(db.String(50), nullable=False)
-    email_user = db.Column(db.String(100), nullable=False)
-    password_user = db.Column(db.Text, nullable=False)
-    def __repr__(self):
-        return '<Users %r>' % self.id_user
+class Users(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True)
+    password = db.Column(db.Text, unique=True)
 
-
-@app.route("/")
-def home():
-    users = Users.query.all() 
-    return render_template('home.html', users=users)
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
 
 @app.route("/login")
 def loginInit():
@@ -50,14 +48,26 @@ def loginInit():
 
 @app.route("/login", methods=['POST'])
 def login():
-    mail = request.form['mail']
-    password = request.form['password']
-    users = Users.query.filter(Users.email_user.endswith(mail)).all()
-    passwordTest = users.email_user
-    return render_template('login.html', passwordTest=passwordTest)
-    
-    
+    usernameForm = request.form['username']
+    passwordForm = request.form['password']
+    users = Users.query.filter_by(username=usernameForm).first()
+    login_user(users)
+    if users is None:
+        error = "Aucun compte avec " + usernameForm
+    else:
+        password = users.password
+        if passwordForm == password:
+            return render_template('news.html')
+        else:
+            error = "Le mot de passe est incorrect"
+    return render_template('login.html', error=error)
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash('Vous etes maintenant deconnecte')
+    return redirect(url_for('login'))
 
 @app.route("/sign")
 def signInit():
@@ -65,16 +75,20 @@ def signInit():
 
 @app.route("/sign", methods=['POST'])
 def sign():
-    nom = request.form['nom']
-    prenom = request.form['prenom']
-    mail = request.form['mail']
+    username = request.form['username']
     password = request.form['password']
-    users = Users(nom_user=nom,prenom_user=prenom,email_user=mail,password_user=password)
-    db.session.add(u)
+    users = Users(username=username,password=password)
+    db.session.add(users)
     db.session.commit()
     return render_template('sign.html')
 
+@app.route("/")
+def home():
+    users = Users.query.all() 
+    return render_template('home.html', users=users)
+
 @app.route("/news")
+@login_required
 def apiNews():
     return render_template('news.html')
 
