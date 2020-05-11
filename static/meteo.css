@@ -1,0 +1,22 @@
+.map path {
+    fill: #17a2b8;
+    stroke: rgb(214, 214, 214);
+    stroke-width: 1px;
+    transition: fill 0.3s;
+}
+.map path:hover {
+    fill: #00dbfd;
+}
+
+@media (max-width: 1000px) {
+    div .all {
+        display: block;
+    }
+    .all .donneMeteo {
+        max-width: 100%;
+        width: 90%;
+    }
+    .all .barMap{
+        max-width: 90%;
+    }
+}

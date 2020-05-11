@@ -1,0 +1,8 @@
+@media (max-width: 750px) {
+    body header .header {
+        display: block;
+    }
+    .header div{
+        max-width: 100%;
+    }
+}

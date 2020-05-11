@@ -1,0 +1,17 @@
+@media (max-width: 1000px) {
+    .container .liste {
+        display: block;
+    }
+    .liste .item{
+        max-width: 100%;
+        width: 90%;
+    }
+}
+@media (max-width: 800px) {
+    .container .search {
+        display: block;
+    }
+}
+.search {
+    display: flex;
+}

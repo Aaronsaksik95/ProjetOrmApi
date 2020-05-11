@@ -33,7 +33,7 @@ def apiMeteo():
 
 
     main = content['main']
-
+    cloud = content['clouds']
     temp = main['temp'] - 273.15
     temp = round(temp, 2)
     temp_min = main['temp_min'] - 273.15
@@ -42,8 +42,9 @@ def apiMeteo():
     humi = main['humidity']
     wind = content['wind']['speed'] * 1.792
     wind = round(wind, 2)
+    nuage = cloud['all']
     date = datetime.datetime.now().strftime('%d-%m-%Y')
-    return render_template('meteo.html', ville=ville, main=main, temp=temp, temp_min=temp_min, temp_max=temp_max, press=press, humi=humi, wind=wind, date=date)      
+    return render_template('meteo.html', ville=ville, nuage=nuage, main=main, temp=temp, temp_min=temp_min, temp_max=temp_max, press=press, humi=humi, wind=wind, date=date)      
 
 
     
@@ -65,16 +66,15 @@ def covidInit():
 
 @app.route("/covid-19",  methods=['POST'])
 def apiCovid():
-    COVID_API_URL_WORLD = "https://api.covid19api.com/world/total"
-    responseWorld = requests.get(COVID_API_URL_WORLD)
-    contentWorld = json.loads(responseWorld.content.decode('utf-8'))
-    confirme = contentWorld['TotalConfirmed']
-    death = contentWorld['TotalDeaths']
-    recover = contentWorld['TotalRecovered']
     COVID_API_URL_PAYS = "https://api.covid19api.com/summary"
     responsePays = requests.get(COVID_API_URL_PAYS)
     contentPays = json.loads(responsePays.content.decode('utf-8'))
     countries = contentPays["Countries"]
+    glob = contentPays["Global"]
+    confirme = glob['TotalConfirmed']
+    death = glob['TotalDeaths']
+    recover = glob['TotalRecovered']
+
     pays = request.form['pays']
     date = request.form['date'] + "T00:00:00Z"
     COVID_API_URL = "https://api.covid19api.com/live/country/{}/status/confirmed/date/{}".format(
