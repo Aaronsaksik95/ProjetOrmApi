@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Api Météo
+{% endblock title %}
+
+{% block intro %}
+Celle-ci retourne la météo de n'importe quelle Ville ou de n'importe quelle Département de France,
+avec comme option : soit une barre de recherche, soit la carte régionale.
+{% endblock intro %}
+
+{% block content %}
+<div class=" pl-5 pr-5">
+    <img class="img-fluid p-5" src="{{articleSelect.image_article}}" alt="">
+    <div class="">
+        {% if articleSelect.auteur_article == "None" %}
+        <h6 class="card-subtitle mt-2 text-info">Publié le {{articleSelect.date_article}}</h6>
+        {% else %}
+        <h6 class="card-subtitle mt-2 text-info">Par {{articleSelect.auteur_article}} Publié le
+            {{articleSelect.date_article}}</h6>
+        {% endif %}
+        <h5 class="card-title mt-1 font-weight-light">{{articleSelect.title_article}}</h5>
+        <p>{{articleSelect.desc_article}}</p>
+        <p>{{articleSelect.content_article}}</p>
+    </div>
+    <div>
+        <div class="w-50 mb-5 mt-5">
+            <form method="POST" action="{{ url_for('New') }}">
+                <textarea class="form-control" name="com" id="exampleFormControlTextarea1" rows="2"
+                    placeholder="Ajouter un commentaire..."></textarea>
+                <button type="submit" class="btn btn-info mt-3">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div class="w-50 border-left pl-2 p-1">
+        <p>aaron</p>
+        <h6 class="font-weight-light">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur cum
+            laboriosam voluptate a amet unde neque ut. Hic, temporibus neque culpa, suscipit tempore vitae placeat
+            corporis veniam magnam nobis omnis.</h6>
+    </div>
+</div>
+{% endblock content %}

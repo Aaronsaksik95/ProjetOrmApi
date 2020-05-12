@@ -20,10 +20,12 @@ db = SQLAlchemy(app)
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     image_article = db.Column(db.Text, nullable=False)
+    auteur_article = db.Column(db.String(50), nullable=True)
     title_article = db.Column(db.Text, nullable=False)
+    desc_article = db.Column(db.Text, nullable=False)
     content_article = db.Column(db.Text, nullable=False)
-    date_article = db.Column(db.DateTime, nullable=False)
-    journal_article = db.Column(db.String(50), nullable=False)
+    date_article = db.Column(db.DateTime, nullable=True)
+    source_article = db.Column(db.String(50), nullable=False)
     def __repr__(self):
         return '<Article %r>' % self.id_article
 
@@ -88,7 +90,42 @@ def home():
 
 @app.route("/news")
 def apiNews():
-    return render_template('news.html')
+    NEWS_API_URL = "http://newsapi.org/v2/top-headlines?sources=google-news-fr&apiKey=3a38e22cd69b41fcbd7782a981876815"
+    response = requests.get(NEWS_API_URL)
+    content = json.loads(response.content.decode('utf-8'))
+    news = content["articles"]
+    for new in news:
+        image = new['urlToImage']
+        auteur = new['author']
+        title = new['title']
+        desc = new['description']
+        content = new['content']
+        source = new['source']['name']
+        date = new['publishedAt']
+        date = date[0:10]
+        verifArt = Article.query.filter_by(image_article=image).first()
+        if verifArt is None:
+            article = Article(image_article=image, auteur_article=auteur, title_article=title, desc_article=desc, content_article=content, date_article=date, source_article=source)
+            db.session.add(article)
+            db.session.commit()
+        allArticles = Article.query.order_by(Article.id).all()
+    return render_template('news.html', allArticles=allArticles)
+
+@app.route("/new")
+def New():
+    idArt = request.args.get('id')
+    articleSelect = Article.query.filter_by(id=idArt).first()
+    return render_template('new.html', articleSelect=articleSelect)
+
+@app.route("/commentaire", methods=['POST'])
+def Com():
+    com = request.form['com']
+    date = datetime.datetime.now()
+    com = Commentaire(content_com=com, date_com=date)
+    db.session.add(com)
+    db.session.commit()
+    return render_template('new.html')
+
 
 
 @app.route("/meteo", methods=['GET', 'POST'])
