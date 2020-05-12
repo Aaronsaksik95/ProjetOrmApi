@@ -13,13 +13,13 @@ Grace à cette Api nous vous offrons les meilleurs informations, afin de ne rien
     {% for article in allArticles %}
     <div class="card m-3 p-0 col-3 border-info item">
         <div class="card-body">
-            <a href="/new?id={{article.id}}"><img src="{{article.image_article}}" class="img-fluid" alt=""></a>
+            <a href="{{url_for('New', id=article.id)}}"><img src="{{article.image_article}}" class="img-fluid" alt=""></a>
             {% if article.auteur_article == "null" %}
             <h6 class="card-subtitle mt-2 text-info font-weight-light">Publié le {{article.date_article}}</h6>
             {% else %}
             <h6 class="card-subtitle mt-2 text-info font-weight-light">Par {{article.auteur_article}} Publié le
                 {{article.date_article}}</h6>
-            {% endif %} <a href="/new?id={{article.id}}">
+            {% endif %} <a href="{{url_for('New', id=article.id)}}">
                 <h5 class="card-title mt-1 font-weight-light">{{article.title_article}}</h5>
             </a>
             <p>{{article.desc_article}}</p>

@@ -24,19 +24,19 @@ avec comme option : soit une barre de recherche, soit la carte régionale.
         <p>{{articleSelect.content_article}}</p>
     </div>
     <div>
+        
         <div class="w-50 mb-5 mt-5">
-            <form method="POST" action="{{ url_for('New') }}">
-                <textarea class="form-control" name="com" id="exampleFormControlTextarea1" rows="2"
-                    placeholder="Ajouter un commentaire..."></textarea>
-                <button type="submit" class="btn btn-info mt-3">Submit</button>
+            <form method="POST" action="/commentaire?id={{articleSelect.id}}">
+                <textarea class="form-control" name="comm" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <button type="submit" class="btn btn-info mt-3">Envoyer</button>
             </form>
         </div>
     </div>
+    {% for com in allCom %}
     <div class="w-50 border-left pl-2 p-1">
-        <p>aaron</p>
-        <h6 class="font-weight-light">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur cum
-            laboriosam voluptate a amet unde neque ut. Hic, temporibus neque culpa, suscipit tempore vitae placeat
-            corporis veniam magnam nobis omnis.</h6>
+        <p>{{com.date_com}}</p>
+        <h6 class="font-weight-light">{{com.content_com}}</h6>
     </div>
+    {% endfor %}
 </div>
 {% endblock content %}
