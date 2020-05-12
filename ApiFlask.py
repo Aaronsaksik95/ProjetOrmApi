@@ -19,6 +19,7 @@ db = SQLAlchemy(app)
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    image_article = db.Column(db.Text, nullable=False)
     title_article = db.Column(db.Text, nullable=False)
     content_article = db.Column(db.Text, nullable=False)
     date_article = db.Column(db.DateTime, nullable=False)
@@ -63,10 +64,8 @@ def login():
     return render_template('login.html', error=error)
 
 @app.route("/logout")
-@login_required
 def logout():
     logout_user()
-    flash('Vous etes maintenant deconnecte')
     return redirect(url_for('login'))
 
 @app.route("/sign")
@@ -88,7 +87,6 @@ def home():
     return render_template('home.html', users=users)
 
 @app.route("/news")
-@login_required
 def apiNews():
     return render_template('news.html')
 
