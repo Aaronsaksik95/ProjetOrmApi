@@ -6,20 +6,23 @@ Connexion
 
 {% block content %}
 <div class="w-25 mx-auto">
-    <form method="POST">
-        <div class="form-group">
-            <label>Username</label>
-            <input type="text" class="form-control" name="username" placeholder="Username" >
-        </div>
-        <div class="form-group">
-            <label>Mot de passe</label>
-            <input type="password" class="form-control" name="password" placeholder="*******" >
-        </div>
+    <form method="POST" action="/login">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.username) }}
+        {{ wtf.form_field(form.password) }}
         <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="/sign" class="text-info ml-3">Inscription</a>
     </form>
-    <div class="text-danger mt-2">
-        {{error}}
+    <div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <p class="text-danger">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
+
 </div>
 
 {% endblock content %}

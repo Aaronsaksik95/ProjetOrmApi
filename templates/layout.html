@@ -1,4 +1,5 @@
 {# Ajouter Bootstrap #}
+{% import "bootstrap/wtf.html" as wtf %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +16,8 @@
 
 <body>
   <header>
+    {% block alert %}
+    {% endblock alert %}
     <div class="row m-5 pb-5 header">
       <div class="col-3 border-right">
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -22,22 +25,22 @@
           <a class="nav-link text-info" id="v-pills-profile-tab" href="/news">News</a>
           <a class="nav-link text-info" id="v-pills-messages-tab" href="/meteo?name=Paris">Météo</a>
           <a class="nav-link text-info" id="v-pills-settings-tab" href="/covid-19">Covid-19</a>
-            {% if current_user.is_authenticated %}
-            <a class="nav-link dropdown-toggle text-info" data-toggle="dropdown" href="#" role="button"
+          {% if current_user.is_authenticated %}
+          <a class="nav-link dropdown-toggle text-info" data-toggle="dropdown" href="#" role="button"
             aria-haspopup="true" aria-expanded="false">{{ current_user.username }}</a>
-            {% else %}
-            <a class="nav-link dropdown-toggle text-info" data-toggle="dropdown" href="#" role="button"
+          {% else %}
+          <a class="nav-link dropdown-toggle text-info" data-toggle="dropdown" href="#" role="button"
             aria-haspopup="true" aria-expanded="false">Connexion</a>
-            {% endif %}
+          {% endif %}
 
-          
+
           <div class="dropdown-menu">
             {% if current_user.is_authenticated %}
             <p></p>
             {% else %}
             <a class="dropdown-item" href="/login">Connexion</a>
             {% endif %}
-            
+
             <a class="dropdown-item" href="/sign">Inscription</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/logout">Déconnexion</a>

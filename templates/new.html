@@ -13,18 +13,13 @@ avec comme option : soit une barre de recherche, soit la carte régionale.
 <div class=" pl-5 pr-5">
     <img class="img-fluid p-5" src="{{articleSelect.image_article}}" alt="">
     <div class="">
-        {% if articleSelect.auteur_article == "None" %}
         <h6 class="card-subtitle mt-2 text-info">Publié le {{articleSelect.date_article}}</h6>
-        {% else %}
-        <h6 class="card-subtitle mt-2 text-info">Par {{articleSelect.auteur_article}} Publié le
-            {{articleSelect.date_article}}</h6>
-        {% endif %}
         <h5 class="card-title mt-1 font-weight-light">{{articleSelect.title_article}}</h5>
         <p>{{articleSelect.desc_article}}</p>
         <p>{{articleSelect.content_article}}</p>
     </div>
     <div>
-        
+
         <div class="w-50 mb-5 mt-5">
             <form method="POST" action="/commentaire?id={{articleSelect.id}}">
                 <textarea class="form-control" name="comm" id="exampleFormControlTextarea1" rows="3"></textarea>
@@ -33,9 +28,13 @@ avec comme option : soit une barre de recherche, soit la carte régionale.
         </div>
     </div>
     {% for com in allCom %}
-    <div class="w-50 border-left pl-2 p-1">
-        <p>{{com.date_com}}</p>
-        <h6 class="font-weight-light">{{com.content_com}}</h6>
+    <div class="w-50 border-left pl-2 p-1 m-3">
+        <div class="d-flex">
+            <h6 class="font-weight-light">{{com.user.username}}</h6>
+            <small class="font-weight-light ml-3 text-muted">{{com.date_com}}</small>
+        </div>
+        <h5 class="font-weight-light">{{com.content_com}}</h5>
+
     </div>
     {% endfor %}
 </div>

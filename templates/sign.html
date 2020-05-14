@@ -1,24 +1,28 @@
 {% extends "layout.html" %}
 
+
 {% block title %}
 Inscription
 {% endblock title %}
 
 {% block content %}
 <div class="w-25 mx-auto">
-    <form method="POST">
-        <div class="form-group">
-            <label for="inputAddress">Username</label>
-            <input type="text" class="form-control" name="username" placeholder="Saksik">
-        </div>
-        <div class="form-group">
-            <label for="inputPassword4">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-        </div>
+    <form method="POST" action="/sign">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.username) }}
+        {{ wtf.form_field(form.email) }}
+        {{ wtf.form_field(form.password) }}
         <button type="submit" class="btn btn-primary">Sign in</button>
+        <a href="/login" class="text-info ml-3">Connexion</a>
     </form>
-    <div class="text-danger mt-2">
-        {{error}}
+    <div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <p class="text-danger">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
 </div>
 
