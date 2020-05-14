@@ -25,6 +25,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 login_manager.login_view = 'login'
 
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()], render_kw={"placeholder": "Aaron99"})
     password = PasswordField('Password', validators=[InputRequired()], render_kw={"placeholder": "*******"})
