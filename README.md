@@ -1,6 +1,6 @@
 # ProjetOrmApi
 
-- git clone 
+- git clone https://github.com/Aaronsaksik95/ProjetOrmApi.git
 
 - Importez le fichier environment.yml dans "Environments" sur Anaconda pour créer un environnement dédié à l'application.
 
