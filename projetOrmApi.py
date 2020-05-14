@@ -19,8 +19,8 @@ bootstrap = Bootstrap(app)
 app.secret_key = "super secret key"
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:8889/projetTest'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/projetFlask'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:8889/projetOrmApi'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/projetOrmApi'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 login_manager.login_view = 'login'
