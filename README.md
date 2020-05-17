@@ -16,6 +16,6 @@
 
 - Allez dans le dossier "ProjetOrmApi" à l'aide de la commande cd
 
-- Faites un python projetOrmApi.py
+- Faites un python app.py
 
 - Plus qu'à admirer le site Web depuis localhost:5000
