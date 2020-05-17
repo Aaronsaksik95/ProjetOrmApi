@@ -18,41 +18,51 @@
   <header>
     {% block alert %}
     {% endblock alert %}
-    <div class="row m-5 pb-5 header">
-      <div class="col-3 border-right">
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <a class="nav-link active bg-info" id="v-pills-home-tab" href="/">Cleaner News</a>
-          <a class="nav-link text-info" id="v-pills-profile-tab" href="/news">News</a>
-          <a class="nav-link text-info" id="v-pills-messages-tab" href="/meteo?name=Paris">Météo</a>
-          <a class="nav-link text-info" id="v-pills-settings-tab" href="/covid-19">Covid-19</a>
-          {% if current_user.is_authenticated %}
+    <h1 class="text-info text-center mt-3">Cleaner News</h1>
+    <div class="m-3 pb-5 header">
+      <div class="w-50 mx-auto mt-5">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active bg-info text-white" id="v-pills-home-tab" href="/">Cleaner News</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-info" id="v-pills-profile-tab" href="/news">News</a>          </li>
+          <li class="nav-item">
+            <a class="nav-link text-info" id="v-pills-messages-tab" href="/meteo?name=Paris">Météo</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-info" id="v-pills-settings-tab" href="/covid-19">Covid-19</a>
+          </li>
+          <li class="nav-item">
+            {% if current_user.is_authenticated %}
           <a class="nav-link dropdown-toggle text-info" data-toggle="dropdown" href="#" role="button"
             aria-haspopup="true" aria-expanded="false">{{ current_user.username }}</a>
           {% else %}
           <a class="nav-link dropdown-toggle text-info" data-toggle="dropdown" href="#" role="button"
-            aria-haspopup="true" aria-expanded="false">Connexion</a>
+            aria-haspopup="true" aria-expanded="false">Profil</a>
           {% endif %}
-
-
           <div class="dropdown-menu">
             {% if current_user.is_authenticated %}
             <p></p>
             {% else %}
-            <a class="dropdown-item" href="/login">Connexion</a>
+            <a class="dropdown-item mb-2" href="/login">Connexion</a>
             {% endif %}
-
-            <a class="dropdown-item" href="/sign">Inscription</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="/logout">Déconnexion</a>
-          </div>
-        </div>
+            <a class="dropdown-item mb-2" href="/sign">Inscription</a>
+            {% if current_user.is_authenticated %}
+            <a class="dropdown-item mb-2" href="/logout">Déconnexion</a>
+            {% else %}
+            <p></p>
+            {% endif %}
+          </li>
+        </ul>
+        
       </div>
-      <div class="col-9">
-        <div class="d-flex justify-content-around">
-          <h1 class="text-center mb-4 text-info">
+      <div class="m-5 w-75 mx-auto">
+        <div class="d-flex">
+          <h3 class="mb-4 text-muted">
             {% block title %}
             {% endblock title %}
-          </h1>
+          </h3>
 
 
 

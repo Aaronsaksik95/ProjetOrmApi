@@ -12,5 +12,61 @@
 </div>
 {% endblock alert %}
 
+{% block title %}
+Cleaner News
+{% endblock title %}
+
+
+
 {% block content %}
+<div class="d-flex justify-content-between">
+
+    <div class="w-25 border-left">
+        <h3 class="p-2 font-weight-light text-center">Ne manquez pas ces News!</h3>
+        {% for article in allArticles %}
+        <div class="  p-0 item w-100">
+            <div class="card-body">
+                <a href="{{url_for('New', id=article.id)}}"><img src="{{article.image_article}}"
+                        class="img-fluid rounded" alt=""></a>
+                <div class="">
+                    <h6 class="card-subtitle mt-2 text-info font-weight-light">Publié le {{article.date_article}}</h6>
+                    <a href="{{url_for('New', id=article.id)}}">
+                        <h5 class="card-title mt-1 font-weight-light">{{article.title_article}}</h5>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <a class="text-info pl-2" href="/news">Plus de News ></a>
+    </div>
+    <div class="w-50 ">
+        <div class="donneMeteo mb-5 border-left">
+            <div class="card-body">
+                <h1 class="card-title mb-3 font-weight-light">Météo de Paris</h1>
+                <h6 class="card-subtitle mb-4 text-info">{{date}}</h6>
+                <p class="card-text h3 font-weight-light mb-3">Température: <span class="text-info">{{temp}}°C.</span>
+                </p>
+                <p class="card-text h3 font-weight-light mb-3">Vent: <span class="text-info">{{wind}} Km/h.</span></p>
+                <p class="card-text h3 font-weight-light mb-3">Pression: <span class="text-info">{{press}} hPa.</span>
+                </p>
+                <p class="card-text h3 font-weight-light mb-3">Humidité: <span class="text-info">{{humi}} %.</span></p>
+                <p class="card-text h3 font-weight-light mb-3">Ciel recouvert: <span class="text-info">{{nuage}}
+                        %.</span>
+                </p>
+                <p>Venez découvrir la <a class="text-info" href="/meteo?name=Paris">météo</a> de toute la France.</p>
+            </div>
+
+
+        </div>
+        <div class="mt-5 p-3 world border-left">
+            <h1 class="font-weight-light mb-4 w-75">Cas de Covid-19 dans le Monde</h1>
+
+            <p class="card-text h4 font-weight-light mb-3">Cas confirmé(s): <span class="text-danger">{{confirme}}</span></p>
+            <p class="card-text h4 font-weight-light mb-3">Cas rétabli(s): <span class="text-danger">{{death}}</span></p>
+            <p class="card-text h4 font-weight-light mb-3">Cas mort(s): <span class="text-danger">{{recover}}</span></p>
+            <p>vous pouvez également connaitre le nombre exact </br>de cas de <a class="text-info" href="/covid-19">Covid-19</a> dans le monde entier.</p>
+        </div>
+    </div>
+
+</div>
 {% endblock content %}

@@ -1,14 +1,17 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Les meilleurs nouvelles du moment.
+News
 {% endblock title %}
 
 {% block intro %}
-Grace à cette Api nous vous offrons les meilleurs informations, afin de ne rien manquer d'important.
+Grace à cette Api nous vous offrons les meilleurs informations, afin de ne rien manquer.
+De nombreux articles sont publiés chaque heure sur tous les sujets importants du moment tirés de differents journaux.
 {% endblock intro %}
 
 {% block content %}
+<p>Filtrez ces articles avec une date, si vous le souhaitez.</p>
+<input type="date" class="form-control w-25 mb-4" name="date" value="">
 <div class="row mx-auto justify-content-around">
     {% for article in allArticles %}
     <div class="card m-3 p-0 col-3 border-info item">

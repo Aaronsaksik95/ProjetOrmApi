@@ -37,7 +37,6 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "*******"})
     remember = BooleanField('remember me')
 
-
 class Article(db.Model):
     __tablename__ = 'article'
     id = db.Column(db.Integer, primary_key=True)
@@ -114,21 +113,66 @@ def sign():
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
         users = Users.query.filter_by(username=form.username.data).first()
+        usersEmail = Users.query.filter_by(email=form.email.data).first()
         if users is None:
-            new_user = Users(username=form.username.data, email=form.email.data, password=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(users, remember=form.remember.data)
-            return redirect(url_for('home'))
+            if usersEmail is None:
+                new_user = Users(username=form.username.data, email=form.email.data, password=hashed_password)
+                db.session.add(new_user)
+                db.session.commit()
+                color = "success"
+                login_user(new_user, remember=form.remember.data)
+                flash('Vous êtes bien connecté en tant que ' + form.username.data)
+                return render_template('home.html', color=color)
+            else:
+                flash('Identifiant ou Email déjà utilisé')
         else:
-            flash('Identifiant déjà utilisé')
+            flash('Identifiant ou Email déjà utilisé')
         
     return render_template('sign.html', form=form)
 
 @app.route("/")
 def home():
-    users = Users.query.all() 
-    return render_template('home.html', users=users)
+    NEWS_API_URL = "http://newsapi.org/v2/top-headlines?sources=google-news-fr&apiKey=3a38e22cd69b41fcbd7782a981876815"
+    METEO_API_URL = "http://api.openweathermap.org/data/2.5/weather?q=paris,fr&appid=86bf118c5132d80d5f656123fe6302db"
+    COVID_API_URL_WORLD = "https://api.covid19api.com/world/total"
+    responseWorld = requests.get(COVID_API_URL_WORLD)
+    contentWorld = json.loads(responseWorld.content)
+    responseNews = requests.get(NEWS_API_URL)
+    contentNews = json.loads(responseNews.content.decode('utf-8'))
+    responseMeteo = requests.get(METEO_API_URL)
+    contentMeteo = json.loads(responseMeteo.content.decode('utf-8'))
+    news = contentNews["articles"]
+    for new in news:
+        image = new['urlToImage']
+        auteur = new['author']
+        title = new['title']
+        desc = new['description']
+        content = new['content']
+        source = new['source']['name']
+        date = new['publishedAt']
+        date = date[0:10]
+        verifArt = Article.query.filter_by(image_article=image).first()
+        if verifArt is None:
+            article = Article(image_article=image, auteur_article=auteur, title_article=title, desc_article=desc, content_article=content, date_article=date, source_article=source)
+            db.session.add(article)
+            db.session.commit()
+        allArticles = Article.query.order_by(Article.id).all()
+        allArticles = allArticles[::-1]
+        allArticles = allArticles[0:4]
+    main = contentMeteo['main']
+    cloud = contentMeteo['clouds']
+    temp = main['temp'] - 273.15
+    temp = round(temp, 2)
+    press = main['pressure']
+    humi = main['humidity']
+    wind = contentMeteo['wind']['speed'] * 1.792
+    wind = round(wind, 2)
+    nuage = cloud['all']
+    date = datetime.datetime.now().strftime('%d-%m-%Y')
+    confirme = contentWorld['TotalConfirmed']
+    death = contentWorld['TotalDeaths']
+    recover = contentWorld['TotalRecovered']
+    return render_template('home.html', allArticles=allArticles, nuage=nuage, main=main, temp=temp, press=press, humi=humi, wind=wind, date=date,confirme=confirme, death=death, recover=recover)
 
 @app.route("/news")
 def apiNews():
@@ -150,14 +194,18 @@ def apiNews():
             article = Article(image_article=image, auteur_article=auteur, title_article=title, desc_article=desc, content_article=content, date_article=date, source_article=source)
             db.session.add(article)
             db.session.commit()
-        allArticles = Article.query.order_by(Article.id).all()
-        allArticles = allArticles[::-1]
-    return render_template('news.html', allArticles=allArticles)
+    allArticles = Article.query.order_by(Article.id).all()
+    allArticles = allArticles[::-1]
+    dateNow = datetime.datetime.now()
+
+    return render_template('news.html', allArticles=allArticles, dateNow=dateNow)
 
 @app.route("/new", methods=['GET','POST'])
 def New():
     idArt = request.args.get('id')
     articleSelect = Article.query.filter_by(id=idArt).first()
+    if articleSelect is None:
+        return render_template('errors/errArt.html')
     allCom = Commentaire.query.filter(Commentaire.article_id.endswith(idArt)).all()
     allCom = allCom[::-1]
     return render_template('new.html', articleSelect=articleSelect, allCom=allCom)
@@ -173,11 +221,32 @@ def Comm():
         db.session.commit()
     else:
         return redirect(url_for('login'))
-    idArt = request.args.get('id')
-    articleSelect = Article.query.filter_by(id=idArt).first()
-    allCom = Commentaire.query.filter(Commentaire.article_id.endswith(idArt)).all()
-    allCom = allCom[::-1]
-    return render_template('new.html', articleSelect=articleSelect, allCom=allCom)
+    return redirect(url_for('New', id=request.args.get('id')))
+
+@app.route("/delete", methods=['GET','POST'])
+def delete():
+    if current_user.is_authenticated:
+        idCom = request.args.get('idCom')
+        Commentaire.query.filter_by(id=idCom).delete()
+        db.session.commit()
+    else:
+        return redirect(url_for('login'))
+    idArt = request.args.get('idArt')
+    flash('Votre commentaire a bien été supprimé.')
+    return redirect(url_for('New', id=idArt))
+
+@app.route("/update", methods=['GET','POST'])
+def update():
+    if current_user.is_authenticated:
+        idCom = request.args.get('id')
+        updCom = request.form['update']
+        Commentaire.query.filter_by(id=idCom).update(dict(content_com = updCom))
+        db.session.commit()
+    else:
+        return redirect(url_for('login'))
+    idArt = request.args.get('idArt')
+    return redirect(url_for('New', id=idArt))
+
 
 @app.route("/meteo", methods=['GET', 'POST'])
 def apiMeteo():
@@ -196,15 +265,13 @@ def apiMeteo():
     cloud = content['clouds']
     temp = main['temp'] - 273.15
     temp = round(temp, 2)
-    temp_min = main['temp_min'] - 273.15
-    temp_max = main['temp_max'] - 273.15
     press = main['pressure']
     humi = main['humidity']
     wind = content['wind']['speed'] * 1.792
     wind = round(wind, 2)
     nuage = cloud['all']
     date = datetime.datetime.now().strftime('%d-%m-%Y')
-    return render_template('meteo.html', ville=ville, nuage=nuage, main=main, temp=temp, temp_min=temp_min, temp_max=temp_max, press=press, humi=humi, wind=wind, date=date)      
+    return render_template('meteo.html', ville=ville, nuage=nuage, main=main, temp=temp, press=press, humi=humi, wind=wind, date=date)      
 
 
     
@@ -213,13 +280,13 @@ def apiMeteo():
 def covidInit():
     COVID_API_URL_WORLD = "https://api.covid19api.com/world/total"
     responseWorld = requests.get(COVID_API_URL_WORLD)
-    contentWorld = json.loads(responseWorld.content.decode('utf-8'))
+    contentWorld = json.loads(responseWorld.content)
     confirme = contentWorld['TotalConfirmed']
     death = contentWorld['TotalDeaths']
     recover = contentWorld['TotalRecovered']
     COVID_API_URL_PAYS = "https://api.covid19api.com/summary"
     responsePays = requests.get(COVID_API_URL_PAYS)
-    contentPays = json.loads(responsePays.content.decode('utf-8'))
+    contentPays = json.loads(responsePays.content)
     countries = contentPays["Countries"]
     return render_template('covid.html', countries=countries, confirme=confirme, death=death, recover=recover)
 
@@ -228,7 +295,7 @@ def covidInit():
 def apiCovid():
     COVID_API_URL_PAYS = "https://api.covid19api.com/summary"
     responsePays = requests.get(COVID_API_URL_PAYS)
-    contentPays = json.loads(responsePays.content.decode('utf-8'))
+    contentPays = json.loads(responsePays.content)
     countries = contentPays["Countries"]
     glob = contentPays["Global"]
     confirme = glob['TotalConfirmed']
@@ -239,14 +306,13 @@ def apiCovid():
     COVID_API_URL = "https://api.covid19api.com/live/country/{}/status/confirmed/date/{}".format(
         pays, date)
     response = requests.get(COVID_API_URL)
-    content = json.loads(response.content.decode('utf-8'))
+    content = json.loads(response.content)
     return render_template('covid.html', content=content, pays=pays, countries=countries, confirme=confirme, death=death, recover=recover)
    
 
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('errors/404.html'), 404
-
 
 if __name__ == "__main__":
     app.run(debug=True)
