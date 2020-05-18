@@ -2,16 +2,15 @@ from flask import Flask, render_template, url_for, request, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
-from wtforms.validators import InputRequired, Email, Length
+from sqlalchemy import Table, Column, Integer, String, MetaData, Date, Text, ForeignKey, func
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Table, Column, Integer, String, MetaData, Date, Text, ForeignKey
 from sqlalchemy.orm import relationship
+from forms import LoginForm, RegisterForm
+import datetime
 import sqlalchemy as db
 import requests
 import json
-import datetime
+
 
 
 app = Flask(__name__)
@@ -26,30 +25,45 @@ db = SQLAlchemy(app)
 login_manager.login_view = 'login'
 
 
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired()], render_kw={"placeholder": "Aaron99"})
-    password = PasswordField('Password', validators=[InputRequired()], render_kw={"placeholder": "*******"})
-    remember = BooleanField('remember me')
-
-class RegisterForm(FlaskForm):
-    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)], render_kw={"placeholder": "Example@example.com"})
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)], render_kw={"placeholder": "Aaron99"})
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "*******"})
-    remember = BooleanField('remember me')
+class Users(UserMixin, db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(80), unique=True, nullable=False)
+    commentaires = relationship('Commentaire', backref='user')
+    like = relationship('Like', backref='user')
+    dislike = relationship('Dislike', backref='user')
 
 class Article(db.Model):
     __tablename__ = 'article'
     id = db.Column(db.Integer, primary_key=True)
-    image_article = db.Column(db.Text, nullable=False)
-    auteur_article = db.Column(db.String(50), nullable=True)
+    image_article = db.Column(db.Text, nullable=True)
+    auteur_article = db.Column(db.String(200), nullable=True)
     title_article = db.Column(db.Text, nullable=False)
     desc_article = db.Column(db.Text, nullable=False)
     content_article = db.Column(db.Text, nullable=False)
     date_article = db.Column(db.Date, nullable=False)
     source_article = db.Column(db.String(50), nullable=False)
+    like_article = db.Column(db.Integer, nullable=True, default=0)
+    dislike_article = db.Column(db.Integer, nullable=True, default=0)
     commentaires = relationship('Commentaire', backref='article')
+    like = relationship('Like', backref='article')
+    dislike = relationship('Dislike', backref='article')
     def __repr__(self):
         return '<Article %r>' % self.id_article
+
+class Like(db.Model):
+    __tablename__ = 'like'
+    id = db.Column(db.Integer, primary_key=True)
+    users_id = Column(db.Integer, db.ForeignKey('users.id'))
+    article_id = Column(db.Integer, db.ForeignKey('article.id'))
+
+class Dislike(db.Model):
+    __tablename__ = 'dislike'
+    id = db.Column(db.Integer, primary_key=True)
+    users_id = Column(db.Integer, db.ForeignKey('users.id'))
+    article_id = Column(db.Integer, db.ForeignKey('article.id'))
 
 class Commentaire(db.Model):
     __tablename__ = 'commentaire'
@@ -58,19 +72,9 @@ class Commentaire(db.Model):
     date_com = db.Column(db.Date, nullable=False)
     users_id = Column(db.Integer, db.ForeignKey('users.id'))
     article_id = Column(db.Integer, db.ForeignKey('article.id'))
-
-    #un commentaire pour un user
-    #un article a plusieur commentaire
     def __repr__(self):
         return '<Commentaire %r>' % self.id_com
 
-class Users(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=True, nullable=False)
-    commentaires = relationship('Commentaire', backref='user')
 
 db.create_all()
 db.session.commit()
@@ -87,27 +91,37 @@ def login():
         if users:
             if check_password_hash(users.password, form.password.data):
                 login_user(users, remember=form.remember.data)
-                color = "success"
                 flash('Vous êtes bien connecté en tant que ' + form.username.data)
-                return render_template('home.html', color=color)
+                return redirect(url_for('home'))
             else:
                 flash('Mot de passe ou identifiant incorrect')
         else:
             flash('Mot de passe ou identifiant incorrect')
     return render_template('login.html', form=form)
 
+@app.route("/deleteProfil")
+def DeleteProfil():
+    compte = current_user.username
+    Commentaire.query.filter_by(users_id=current_user.id).delete()
+    Users.query.filter_by(id=current_user.id).delete()
+    db.session.commit()
+    logout_user()
+    flash('Le compte ' + compte + ' a bien été supprimé.')
+    return redirect(url_for('home'))
+
+
 @app.route("/logout")
-def logout():
+def Logout():
+    compte = current_user.username
     if current_user.is_authenticated:
         logout_user()
-        color = "danger"
-        flash('Vous vous êtes déconnecté')
-        return render_template('home.html', color=color)
+        flash('Vous êtes bien déconnecté du compte ' + compte +' .')
+        return redirect(url_for('home'))
     else: 
         return redirect(url_for('login'))
 
 @app.route("/sign", methods=['GET', 'POST'])
-def sign():
+def Sign():
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -119,10 +133,9 @@ def sign():
                 new_user = Users(username=form.username.data, email=form.email.data, password=hashed_password)
                 db.session.add(new_user)
                 db.session.commit()
-                color = "success"
                 login_user(new_user, remember=form.remember.data)
                 flash('Vous êtes bien connecté en tant que ' + form.username.data)
-                return render_template('home.html', color=color)
+                return redirect(url_for('home'))
             else:
                 flash('Identifiant ou Email déjà utilisé')
         else:
@@ -142,6 +155,7 @@ def home():
     responseMeteo = requests.get(METEO_API_URL)
     contentMeteo = json.loads(responseMeteo.content.decode('utf-8'))
     news = contentNews["articles"]
+    news = news[::-1]
     for new in news:
         image = new['urlToImage']
         auteur = new['author']
@@ -180,6 +194,7 @@ def apiNews():
     response = requests.get(NEWS_API_URL)
     content = json.loads(response.content.decode('utf-8'))
     news = content["articles"]
+    news = news[::-1]
     for new in news:
         image = new['urlToImage']
         auteur = new['author']
@@ -196,9 +211,8 @@ def apiNews():
             db.session.commit()
     allArticles = Article.query.order_by(Article.id).all()
     allArticles = allArticles[::-1]
-    dateNow = datetime.datetime.now()
-
-    return render_template('news.html', allArticles=allArticles, dateNow=dateNow)
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    return render_template('news.html', allArticles=allArticles, date=date)
 
 @app.route("/new", methods=['GET','POST'])
 def New():
@@ -208,8 +222,33 @@ def New():
         return render_template('errors/errArt.html')
     allCom = Commentaire.query.filter(Commentaire.article_id.endswith(idArt)).all()
     allCom = allCom[::-1]
-    return render_template('new.html', articleSelect=articleSelect, allCom=allCom)
+    like = Like.query.count()
+    dislike = Dislike.query.count()
+    return render_template('new.html', articleSelect=articleSelect, allCom=allCom, like=like, dislike=dislike)
 
+@app.route("/like", methods=['GET','POST'])
+def like():
+    if current_user.is_authenticated:
+        idArt = request.args.get('id')
+        like = Like(users_id=current_user.id, article_id=idArt)
+        db.session.add(like)
+        db.session.commit()
+        flash('Votre like a bien été envoyé.')
+    else: 
+        return redirect(url_for('login'))
+    return redirect(url_for('New', id=request.args.get('id')))
+
+@app.route("/disLike", methods=['GET','POST'])
+def DisLike():
+    if current_user.is_authenticated:
+        idArt = request.args.get('id')
+        dislike = Dislike(users_id=current_user.id, article_id=idArt)
+        db.session.add(dislike)
+        db.session.commit()
+        flash('Votre dislike a bien été envoyé.')
+    else: 
+        return redirect(url_for('login'))
+    return redirect(url_for('New', id=request.args.get('id')))
 
 @app.route("/commentaire", methods=['GET','POST'])
 def Comm():
@@ -221,6 +260,7 @@ def Comm():
         db.session.commit()
     else:
         return redirect(url_for('login'))
+    flash('Votre commentaire a bien été ajouté.')
     return redirect(url_for('New', id=request.args.get('id')))
 
 @app.route("/delete", methods=['GET','POST'])
@@ -245,6 +285,7 @@ def update():
     else:
         return redirect(url_for('login'))
     idArt = request.args.get('idArt')
+    flash('Votre commentaire a bien été modifié.')
     return redirect(url_for('New', id=idArt))
 
 
