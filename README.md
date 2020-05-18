@@ -1,5 +1,12 @@
 # ProjetOrmApi
 
+GROUPE A6:
+Aaron Saksik
+Alexis Morin
+Yohan Stoecklé
+
+Procédure de lancement du projet:
+
 - git clone https://github.com/Aaronsaksik95/ProjetOrmApi.git
 
 - Importez le fichier environment.yml dans "Environments" sur Anaconda pour créer un environnement dédié à l'application.
