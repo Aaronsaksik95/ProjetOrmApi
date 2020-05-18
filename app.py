@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bootstrap import Bootstrap
-from sqlalchemy import Table, Column, Integer, String, MetaData, Date, Text, ForeignKey, func
+from sqlalchemy import Table, Column, Integer, String, MetaData, Date, Text, ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
 from forms import LoginForm, RegisterForm
@@ -32,14 +32,14 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=True, nullable=False)
     commentaires = relationship('Commentaire', backref='user')
-    like = relationship('Like', backref='user')
-    dislike = relationship('Dislike', backref='user')
+    like = db.relationship('Like', backref='user', uselist=False)
+    dislike = db.relationship('Dislike', backref='user', uselist=False)
 
 class Article(db.Model):
     __tablename__ = 'article'
     id = db.Column(db.Integer, primary_key=True)
     image_article = db.Column(db.Text, nullable=True)
-    auteur_article = db.Column(db.String(200), nullable=True)
+    auteur_article = db.Column(db.String(200), nullable=True, default="Inconnu")
     title_article = db.Column(db.Text, nullable=False)
     desc_article = db.Column(db.Text, nullable=False)
     content_article = db.Column(db.Text, nullable=False)
@@ -56,13 +56,13 @@ class Article(db.Model):
 class Like(db.Model):
     __tablename__ = 'like'
     id = db.Column(db.Integer, primary_key=True)
-    users_id = Column(db.Integer, db.ForeignKey('users.id'))
-    article_id = Column(db.Integer, db.ForeignKey('article.id'))
+    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
 
 class Dislike(db.Model):
     __tablename__ = 'dislike'
     id = db.Column(db.Integer, primary_key=True)
-    users_id = Column(db.Integer, db.ForeignKey('users.id'))
+    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     article_id = Column(db.Integer, db.ForeignKey('article.id'))
 
 class Commentaire(db.Model):
@@ -103,6 +103,8 @@ def login():
 def DeleteProfil():
     compte = current_user.username
     Commentaire.query.filter_by(users_id=current_user.id).delete()
+    Like.query.filter_by(users_id=current_user.id).delete()
+    Dislike.query.filter_by(users_id=current_user.id).delete()
     Users.query.filter_by(id=current_user.id).delete()
     db.session.commit()
     logout_user()
@@ -222,18 +224,32 @@ def New():
         return render_template('errors/errArt.html')
     allCom = Commentaire.query.filter(Commentaire.article_id.endswith(idArt)).all()
     allCom = allCom[::-1]
-    like = Like.query.count()
-    dislike = Dislike.query.count()
+    like = Like.query.filter_by(article_id=idArt).count()
+    dislike = Dislike.query.filter_by(article_id=idArt).count()
     return render_template('new.html', articleSelect=articleSelect, allCom=allCom, like=like, dislike=dislike)
 
 @app.route("/like", methods=['GET','POST'])
 def like():
     if current_user.is_authenticated:
         idArt = request.args.get('id')
-        like = Like(users_id=current_user.id, article_id=idArt)
-        db.session.add(like)
-        db.session.commit()
-        flash('Votre like a bien été envoyé.')
+        verifLike = Like.query.filter_by(users_id=current_user.id, article_id=idArt).first()
+        verifDislike = Dislike.query.filter_by(users_id=current_user.id, article_id=idArt).first()
+        if verifLike is None:
+            if verifDislike is None:
+                like = Like(users_id=current_user.id, article_id=idArt)
+                db.session.add(like)
+                db.session.commit()
+                flash('Votre like a bien été envoyé.')
+            else:
+                Dislike.query.filter_by(users_id=current_user.id, article_id=idArt).delete()
+                like = Like(users_id=current_user.id, article_id=idArt)
+                db.session.add(like)
+                db.session.commit()
+                flash('Votre like a bien été envoyé.')
+        else:
+            Like.query.filter_by(users_id=current_user.id, article_id=idArt).delete()
+            db.session.commit()
+            flash('Votre like a bien été annulé.')
     else: 
         return redirect(url_for('login'))
     return redirect(url_for('New', id=request.args.get('id')))
@@ -242,10 +258,24 @@ def like():
 def DisLike():
     if current_user.is_authenticated:
         idArt = request.args.get('id')
-        dislike = Dislike(users_id=current_user.id, article_id=idArt)
-        db.session.add(dislike)
-        db.session.commit()
-        flash('Votre dislike a bien été envoyé.')
+        verifDislike = Dislike.query.filter_by(users_id=current_user.id, article_id=idArt).first()
+        verifLike = Like.query.filter_by(users_id=current_user.id, article_id=idArt).first()
+        if verifDislike is None:
+            if verifLike is None:
+                dislike = Dislike(users_id=current_user.id, article_id=idArt)
+                db.session.add(dislike)
+                db.session.commit()
+                flash('Votre dislike a bien été envoyé.')
+            else:
+                Like.query.filter_by(users_id=current_user.id, article_id=idArt).delete()
+                dislike = Dislike(users_id=current_user.id, article_id=idArt)
+                db.session.add(dislike)
+                db.session.commit()
+                flash('Votre dislike a bien été envoyé.')
+        else:
+            Dislike.query.filter_by(users_id=current_user.id, article_id=idArt).delete()
+            db.session.commit()
+            flash('Votre dislike a bien été annulé.')
     else: 
         return redirect(url_for('login'))
     return redirect(url_for('New', id=request.args.get('id')))
