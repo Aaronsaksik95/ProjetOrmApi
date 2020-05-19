@@ -9,11 +9,13 @@ Procédure de lancement du projet:
 
 - git clone https://github.com/Aaronsaksik95/ProjetOrmApi.git
 
+- Créez un environnement sur Anaconda  et ouvrez un terminal depuis celui.
+
 -  Tapez la commande pip install -r requirements.txt sur le terminal.
 
 - Créez une base de donnée "projetOrmApi" complètement vide sur phpMyAdmin.
     
-    si vous êtes sur Wamp utiliser la ligne suivante : 
+    si vous êtes sur Wampk utiliser la ligne suivante : 
       app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/projetOrmApi'
     
     si vous êtes sur Mamp utiliser la ligne suivante : 
