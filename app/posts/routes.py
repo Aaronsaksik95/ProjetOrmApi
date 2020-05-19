@@ -74,6 +74,7 @@ def like():
             db.session.commit()
             flash('Votre like a bien été annulé.')
     else: 
+        flash('Veuillez vous connecter avant.')
         return redirect(url_for('users.login'))
     return redirect(url_for('.New', id=request.args.get('id')))
 
@@ -100,7 +101,8 @@ def DisLike():
             db.session.commit()
             flash('Votre dislike a bien été annulé.')
     else: 
-        return redirect(url_for('user.login'))
+        flash('Veuillez vous connecter avant.')
+        return redirect(url_for('users.login'))
     return redirect(url_for('.New', id=request.args.get('id')))
 
 @posts.route("/commentaire", methods=['GET','POST'])
@@ -112,7 +114,8 @@ def Comm():
         db.session.add(commentaire)
         db.session.commit()
     else:
-        return redirect(url_for('user.login'))
+        flash('Veuillez vous connecter avant.')
+        return redirect(url_for('users.login'))
     flash('Votre commentaire a bien été ajouté.')
     return redirect(url_for('.New', id=request.args.get('id')))
 
@@ -123,7 +126,8 @@ def delete():
         Commentaire.query.filter_by(id=idCom).delete()
         db.session.commit()
     else:
-        return redirect(url_for('user.login'))
+        flash('Veuillez vous connecter avant.')
+        return redirect(url_for('users.login'))
     idArt = request.args.get('idArt')
     flash('Votre commentaire a bien été supprimé.')
     return redirect(url_for('.New', id=idArt))
@@ -136,7 +140,8 @@ def update():
         Commentaire.query.filter_by(id=idCom).update(dict(content_com = updCom))
         db.session.commit()
     else:
-        return redirect(url_for('user.login'))
+        flash('Veuillez vous connecter avant.')
+        return redirect(url_for('users.login'))
     idArt = request.args.get('idArt')
     flash('Votre commentaire a bien été modifié.')
     return redirect(url_for('.New', id=idArt))
