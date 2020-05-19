@@ -9,7 +9,7 @@ Procédure de lancement du projet:
 
 - git clone https://github.com/Aaronsaksik95/ProjetOrmApi.git
 
-- Importez le fichier environment.yml dans "Environments" sur Anaconda pour créer un environnement dédié à l'application.
+-  Tapez la commande pip install -r requirements.txt sur le terminal.
 
 - Créez une base de donnée "projetOrmApi" complètement vide sur phpMyAdmin.
     
