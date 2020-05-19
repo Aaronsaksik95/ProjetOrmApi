@@ -11,8 +11,7 @@ De nombreux articles sont publiés chaque heure sur tous les sujets importants d
 
 {% block content %}
 <link rel="stylesheet" href="../static/news.css">
-<p>Filtrez ces articles avec une date, si vous le souhaitez.</p>
-<input type="date" class="form-control w-25 mb-4" name="date" value="{{date}}">
+
 <div class="row liste mx-auto justify-content-around">
     {% for article in allArticles %}
     <div class="card m-3 p-0 col-3 border-info item">
