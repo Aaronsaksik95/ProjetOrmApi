@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_login import current_user
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length
 
@@ -13,3 +14,4 @@ class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=15)], render_kw={"placeholder": "Aaron99"})
     password = PasswordField('Mot de passe', validators=[InputRequired(), Length(min=8, max=80)], render_kw={"placeholder": "*******"})
     remember = BooleanField('remember me')
+

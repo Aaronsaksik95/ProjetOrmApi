@@ -119,6 +119,3 @@ def apiCovid():
     content = json.loads(response.content)
     return render_template('covid.html', content=content, pays=pays, countries=countries, confirme=confirme, death=death, recover=recover)
    
-@main.errorhandler(404)
-def page_not_found(error):
-    return render_template('errors/404.html'), 404

@@ -67,3 +67,34 @@ def Sign():
             flash('Identifiant ou Email déjà utilisé')
         
     return render_template('sign.html', form=form)
+
+@users.route("/profil")
+def initprofil():
+    return render_template('profil.html')
+
+@users.route("/profil", methods=['GET', 'POST'])
+def profil():
+    if current_user.is_authenticated:
+        if request.method == 'POST':
+            newUsername = request.form['name']
+            newMail = request.form['mail']
+            users = Users.query.filter_by(username=newUsername).first()
+            usersEmail = Users.query.filter_by(email=newMail).first()
+            if users is None or usersEmail is None:
+                Users.query.filter_by(id=current_user.id).update(dict(username = newUsername))
+                db.session.commit()
+                Users.query.filter_by(id=current_user.id).update(dict(email = newMail))
+                db.session.commit()
+                flash('Vos données personnelles ont été modifié.')
+                return redirect(url_for('main.home'))
+            else:
+                flash('Identifiant ou Email déjà utilisé')
+                return redirect(url_for('users.profil'))
+        else:
+            return redirect(url_for('main.home'))
+        
+    else:
+        flash('Veuillez vous connecter avant.')
+        return redirect(url_for('users.login'))
+    
+    return render_template('profil.html')

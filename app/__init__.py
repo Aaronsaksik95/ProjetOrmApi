@@ -1,5 +1,5 @@
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask import Flask
+from flask import Flask, render_template
 from sqlalchemy.orm import relationship
 import sqlalchemy as db
 
@@ -20,7 +20,9 @@ login_manager.login_view = 'users.login'
 db = SQLAlchemy()
 db.init_app (app) 
 
-
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('errors/404.html'), 404
 
 @login_manager.user_loader
 def load_user(user_id):
