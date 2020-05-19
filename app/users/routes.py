@@ -53,16 +53,13 @@ def Sign():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
         users = Users.query.filter_by(username=form.username.data).first()
         usersEmail = Users.query.filter_by(email=form.email.data).first()
-        if users is None:
-            if usersEmail is None:
-                new_user = Users(username=form.username.data, email=form.email.data, password=hashed_password)
-                db.session.add(new_user)
-                db.session.commit()
-                login_user(new_user, remember=form.remember.data)
-                flash('Vous êtes bien connecté en tant que ' + form.username.data)
-                return redirect(url_for('main.home'))
-            else:
-                flash('Identifiant ou Email déjà utilisé')
+        if users is None or usersEmail is None:
+            new_user = Users(username=form.username.data, email=form.email.data, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user, remember=form.remember.data)
+            flash('Vous êtes bien connecté en tant que ' + form.username.data)
+            return redirect(url_for('main.home'))
         else:
             flash('Identifiant ou Email déjà utilisé')
         
