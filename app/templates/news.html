@@ -17,9 +17,9 @@ De nombreux articles sont publiés chaque heure sur tous les sujets importants d
     {% for article in allArticles %}
     <div class="card m-3 p-0 col-3 border-info item">
         <div class="card-body">
-            <a href="{{url_for('New', id=article.id)}}"><img src="{{article.image_article}}" class="img-fluid" alt=""></a>
+            <a href="{{url_for('.New', id=article.id)}}"><img src="{{article.image_article}}" class="img-fluid" alt=""></a>
             <h6 class="card-subtitle mt-2 text-info font-weight-light">Publié le {{article.date_article}}</h6>
-            <a href="{{url_for('New', id=article.id)}}">
+            <a href="{{url_for('.New', id=article.id)}}">
                 <h5 class="card-title mt-1 font-weight-light">{{article.title_article}}</h5>
             </a>
             <p>{{article.desc_article}} {{article.id}}</p>

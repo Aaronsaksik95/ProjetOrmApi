@@ -26,11 +26,11 @@ Cleaner News
         {% for article in allArticles %}
         <div class="  p-0 item w-100">
             <div class="card-body">
-                <a href="{{url_for('New', id=article.id)}}"><img src="{{article.image_article}}"
+                <a href="/new?id={{article.id}}"><img src="{{article.image_article}}"
                         class="img-fluid rounded" alt=""></a>
                 <div class="">
                     <h6 class="card-subtitle mt-2 text-info font-weight-light">Publié le {{article.date_article}}</h6>
-                    <a href="{{url_for('New', id=article.id)}}">
+                    <a href="/new?id={{article.id}}">
                         <h5 class="card-title mt-1 font-weight-light">{{article.title_article}}</h5>
                     </a>
                 </div>
