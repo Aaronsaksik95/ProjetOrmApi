@@ -119,7 +119,7 @@ def Comm():
     flash('Votre commentaire a bien été ajouté.')
     return redirect(url_for('.New', id=request.args.get('id')))
 
-@posts.route("/delete", methods=['GET','POST'])
+@posts.route("/delete", methods=['GET','DELETE'])
 def delete():
     if current_user.is_authenticated:
         idCom = request.args.get('idCom')
