@@ -12,6 +12,11 @@ De nombreux articles sont publiés chaque heure sur tous les sujets importants d
 {% block content %}
 <link rel="stylesheet" href="../static/news.css">
 
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Rechercher..." id="searchbar" aria-label="Recipient's username" aria-describedby="basic-addon2">
+</div>
+<p id="datalist"></p>
+
 <div class="row liste mx-auto justify-content-around">
     {% for article in allArticles %}
     <div class="card m-3 p-0 col-3 border-info item">
@@ -26,4 +31,37 @@ De nombreux articles sont publiés chaque heure sur tous les sujets importants d
     </div>
     {% endfor %}
 </div>
+
+<script>
+    $(document).ready(function(){
+        $("#searchbar").on("input",function(e){
+            textinsearch = $("#searchbar").val();
+            $.ajax({
+                method:"post",
+                url:"/livesearch",
+                data:{text:textinsearch},
+                success:function(res){
+                    var data = "<ul>";
+                    $.each(res,function(index,value){
+                        var id = value[0];
+                        var titre = value[1];
+                        data += "<li class="+ "data-li" + "> <a class="+ "dropdown-item" + " href="+ "new?id=" + id + ">" + titre + "</a></li>";
+                    });
+                    data += "</ul>";
+                    $("#datalist").html(data);
+                }
+            })
+        });
+    })
+</script>
+<style>
+    .data-li{
+    list-style: none;
+    }
+    .data-li a{
+        font-weight: bold;
+        color: #0074D9;
+    }
+</style>
+
 {% endblock content %}

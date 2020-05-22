@@ -1,11 +1,11 @@
-from flask import Blueprint,Flask, render_template, url_for, request, flash, redirect
+from flask import Blueprint,Flask, render_template, url_for, request, flash, redirect, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from app import Article, Commentaire, Users, Like, Dislike
 from app import db
 import requests
 import datetime
 import json
-
+import pymysql
 
 posts = Blueprint('posts',__name__)
 
@@ -145,3 +145,13 @@ def update():
     idArt = request.args.get('idArt')
     flash('Votre commentaire a bien été modifié.')
     return redirect(url_for('.New', id=idArt))
+
+@posts.route("/livesearch",methods=["POST","GET"])
+def livesearch():
+    db = pymysql.connect(host='localhost',user='root',password='',db='projetormapi')
+    cursor = db.cursor()
+    searchbox = request.form.get("text")
+    query = "SELECT id,title_article from article where title_article LIKE '{}%' order by title_article".format(searchbox)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return jsonify(result)
