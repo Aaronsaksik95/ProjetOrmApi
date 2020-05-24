@@ -32,7 +32,7 @@ De nombreux articles sont publiés chaque heure sur tous les sujets importants d
             <a class="h3 ml-5 mr-2 text-danger" href="/disLike?id={{articleSelect.id}}">↓</a>
             <p class="h3 font-weight-light">{{dislike}}</p>
         </div>
-        <h6 class="card-subtitle mt-2 text-info">Ecrit par {{articleSelect.auteur_article}}, Publié le {{articleSelect.date_article}}</h6>
+        <h6 class="card-subtitle mt-2 text-info">Ecrit par <a class="text-center mt-2 m-1 text-muted" href="/newAuteur?auteur={{articleSelect.auteur_article}}">{{articleSelect.auteur_article.upper()}}</a>, Publié le {{articleSelect.date_article}}</h6>
         <h5 class="card-title mt-1 font-weight-light">{{articleSelect.title_article}}</h5>
         <p>{{articleSelect.desc_article}}</p>
         <p>{{articleSelect.content_article}}</p>

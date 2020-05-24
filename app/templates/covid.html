@@ -44,7 +44,7 @@ dans chaque ville d'un pays choisi, mais également en fonction d'une date.
    <div class="row liste justify-content-around">
       {% for i in content %}
       {% if (i.Province == "") %}
-      <div class="card m-3 p-0 col-2 border-info item" >
+      <div class="card m-3 p-0 col-2 border-info item shadow mb-5 rounded" >
          <div class="card-body">
             <h5 class="card-title m font-weight-light">Total à cette date</h5>
             <h6 class="card-subtitle mb-2 text-info">{{i.Date[0:10]}}</h6>
@@ -56,7 +56,7 @@ dans chaque ville d'un pays choisi, mais également en fonction d'une date.
          </div>
       </div>
       {% else %}
-      <div class="card m-3 p-0 col-2 item" >
+      <div class="card m-3 p-0 col-2 item shadow mb-5 rounded" >
          <div class="card-body">
             <h5 class="card-title m font-weight-light">{{i.Province}}</h5>
             <h6 class="card-subtitle mb-2 text-muted">{{i.Date[0:10]}}</h6>

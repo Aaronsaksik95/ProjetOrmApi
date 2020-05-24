@@ -5,7 +5,7 @@ Connexion
 {% endblock title %}
 
 {% block content %}
-<div class="w-25 mx-auto">
+<div class="w-50 bg-light mt-3 p-5 mx-auto">
     <form method="POST" action="/login">
         {{ form.hidden_tag() }}
         {{ wtf.form_field(form.username) }}

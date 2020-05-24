@@ -51,6 +51,21 @@ def New():
         dislike = 0
     return render_template('new.html', articleSelect=articleSelect, allCom=allCom, like=like, dislike=dislike)
 
+@posts.route("/newAuteur", methods=['GET'])
+def NewAuteur():
+    auteur = request.args.get('auteur')
+    allArticles = Article.query.filter(Article.auteur_article.endswith(auteur)).all()
+    allArticles = allArticles[::-1]
+    return render_template('news.html', allArticles=allArticles)
+
+@posts.route("/newDate", methods=['GET'])
+def NewDate():
+    date = request.args.get('date')
+    allArticles = Article.query.filter(Article.date_article.endswith(date)).all()
+    allArticles = allArticles[::-1]
+    return render_template('news.html', allArticles=allArticles)
+
+
 @posts.route("/like", methods=['GET'])
 def like():
     if current_user.is_authenticated:

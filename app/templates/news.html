@@ -23,22 +23,24 @@ De nombreux articles sont publiés chaque heure sur tous les sujets importants d
 {% block content %}
 <link rel="stylesheet" href="../static/news.css">
 
-<div class="input-group mb-3">
-    <form method="POST" action="/search" class="d-flex">
-        <input type="text" name="text" class="form-control ml-5" placeholder="Rechercher..." id="searchbar" aria-label="Recipient's username" aria-describedby="basic-addon2">
-        <button type="submit" class="btn btn-primary ml-5">Rechercher</button>
+<div class="input-group mb-3 w-100">
+    <form method="POST" action="/search" class="d-flex w-50">
+        
+        <input type="text" name="text" class="form-control ml-5 w-100" placeholder="Rechercher un auteur..." id="searchbar" aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <button type="submit" class="btn btn-info ml-5">Rechercher</button>
     </form>
 </div>
 <p id="datalist"></p>
 
 <div class="row liste mx-auto justify-content-around">
     {% for article in allArticles %}
-    <div class="card m-3 p-0 col-3 border-info item">
+    <div class="card m-3 p-0 col-3 shadow mb-5 rounded">
+        <a class="text-center mt-2 m-1 text-muted" href="/newAuteur?auteur={{article.auteur_article}}">{{article.auteur_article.upper()}}</a>
         <div class="card-body">
             <a href="{{url_for('.New', id=article.id)}}"><img src="{{article.image_article}}" class="img-fluid" alt=""></a>
-            <h6 class="card-subtitle mt-2 text-info font-weight-light">Publié le {{article.date_article}} Par {{article.auteur_article}}</h6>
+            <a class="card-subtitle mt-2 text-info font-weight-light" href="/newDate?date={{article.date_article}}">{{article.date_article}}</a>
             <a href="{{url_for('.New', id=article.id)}}">
-                <h5 class="card-title mt-1 font-weight-light">{{article.title_article}}</h5>
+                <h5 class="mt-1 font-weight-light">{{article.title_article}}</h5>
             </a>
             <p>{{article.desc_article}} {{article.id}}</p>
         </div>
