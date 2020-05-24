@@ -146,12 +146,13 @@ def update():
     flash('Votre commentaire a bien été modifié.')
     return redirect(url_for('.New', id=idArt))
 
-@posts.route("/livesearch",methods=["POST","GET"])
-def livesearch():
-    db = pymysql.connect(host='localhost',user='root',password='',db='projetormapi')
-    cursor = db.cursor()
-    searchbox = request.form.get("text")
-    query = "SELECT id,title_article from article where title_article LIKE '{}%' order by title_article".format(searchbox)
-    cursor.execute(query)
-    result = cursor.fetchall()
-    return jsonify(result)
+@posts.route("/search",methods=["POST","GET"])
+def search():
+    searchbox = request.form["text"]
+    search = "%{}%".format(searchbox)
+    allArticles = Article.query.filter(Article.auteur_article.like(search)).all()
+    allArticles = allArticles[::-1]
+    if allArticles == []:
+        flash("Aucun auteur trouvé à se nom.")
+        return redirect(url_for('.apiNews'))
+    return render_template('news.html', allArticles=allArticles)
