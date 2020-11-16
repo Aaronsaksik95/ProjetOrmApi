@@ -10,7 +10,7 @@ from flask_login import LoginManager
 from flask import Flask
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/projetOrmApi'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:8889/projetOrmApi'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/projetOrmApi'
 app.secret_key = "super secret key"
 bootstrap = Bootstrap(app)
